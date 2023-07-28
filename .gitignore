@@ -1,0 +1,7 @@
+# Python virtual environment
+.venv/
+.env
+
+# Docker artifacts
+*.pyc
+.DS_Store
