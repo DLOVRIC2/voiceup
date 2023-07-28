@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    # Build the app service using the Dockerfile in the app directory
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+  db:
+    # Build the database service using the Dockerfile in the db directory
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    # Define a volume for PostgreSQL data
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+# Define the named volume for PostgreSQL data
+volumes:
+  db_data:
