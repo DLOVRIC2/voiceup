@@ -36,7 +36,7 @@ Follow these steps to get VoiceUp up and running:
    docker-compose up
    ```
 
-   This will start the Python app and the PostgreSQL database. You can access the Python app at http://localhost:8000.
+   This will start the Python app and the PostgreSQL database. You can access the Python app at http://localhost:8501.
 
 To stop the application, use the command `docker-compose down`.
 
