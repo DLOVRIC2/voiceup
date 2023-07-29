@@ -39,7 +39,7 @@ def main():
                         story = generator.generate_story(story_summary)
                         st.session_state.story = story
                     # TODO: Implement a clean output text method
-                    st.text_area("AI Generated Story:", value=story.lstrip())
+                    st.text_area("AI Generated Story:", value=st.session_state.story)
 
                 except UnboundLocalError:  # Catch the specific error you're interested in
                     st.error("Please enter your OpenAI API Key to generate a story.")

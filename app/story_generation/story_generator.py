@@ -42,13 +42,10 @@ class StoryTemplates:
 class StoryGenerator:
     def __init__(self, api_key: str = None, model: str = "gpt3.5-turbo"):
 
-        self.model = model
-        if os.environ.get("OPENAI_KEY"):
-            self.llm = OpenAI(temperature=0.9, openai_api_key=os.environ.get("OPENAI_KEY"))
-        else:
-            if not api_key:
-                raise ValueError("API Key must be provided if OPENAI_KEY environment variable is not set")
-            self.llm = OpenAI(temperature=0.9, openai_api_key=api_key)
+        key = os.environ.get("OPENAI_KEY", api_key)
+        if not key:
+            raise ValueError("OPENAI API key must be provided.")
+        self.llm = OpenAI(temperature=0.9, openai_api_key=key)
 
     
     def generate_story(self, idea):
