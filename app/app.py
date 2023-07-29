@@ -47,87 +47,88 @@ def main():
                 st.session_state.story = user_story
 
     elif story_option == "Generate story based on my summary":
-            story_summary = st.text_input("Enter a short summary for your story")
-            submit_button = st.form_submit_button(label='Generate Story')
+            with st.form(key="story_gen_option"):
 
-            if submit_button:
-                try:
-                    with st.spinner('Generating your story...'):
-                        # Generate story
-                        story = generator.generate_story(story_summary)
-                        # TODO: Implement a clean output text method
-                        st.session_state.story = story.lstrip()
-                    st.text_area("AI Generated Story:", value=st.session_state.story)
+                story_summary = st.text_input("Enter a short summary for your story")
+                submit_button = st.form_submit_button(label='Generate Story')
 
-                except UnboundLocalError:  # Catch the specific error you're interested in
-                    st.error("Please enter your OpenAI API Key to generate a story.")
+                if submit_button:
+                    try:
+                        with st.spinner('Generating your story...'):
+                            # Generate story
+                            story = generator.generate_story(story_summary)
+                            # TODO: Implement a clean output text method
+                            st.session_state.story = story.lstrip()
+                        st.text_area("AI Generated Story:", value=st.session_state.story)
+
+                    except UnboundLocalError:  # Catch the specific error you're interested in
+                        st.error("Please enter your OpenAI API Key to generate a story.")
         
     
-    if st.session_state.story != "":
-        audio_option = st.selectbox("Choose an option:", ["Use default voices", "Custom voice!"])
-        if audio_option == "Use default voices":
-            with st.form(key="voice_form"):
+    audio_option = st.selectbox("Choose an option:", ["Use default voices", "Custom voice!"])
+    if audio_option == "Use default voices":
+        with st.form(key="voice_form"):
 
-                voice = st.selectbox("Choose a voice:", voice_generator.get_list_of_voices())
-                model = st.selectbox("Choose a model:", ["eleven_multilingual_v1"])
+            voice = st.selectbox("Choose a voice:", voice_generator.get_list_of_voices())
+            model = st.selectbox("Choose a model:", ["eleven_multilingual_v1"])
 
-                voice_submit_button = st.form_submit_button(label="Generate Audio")
-                if voice_submit_button:
-                    try:
-                        with st.spinner("Generating your audio..."):
-                            # Generate audio
-                            audio = voice_generator.generate_story_audio(
-                                text=st.session_state.story,
-                                voice=voice,
-                                model=model
-                            )
-                            
-                            print(audio)
-                            st.audio(audio, format="audio/mp3")
-                    except UnboundLocalError:  # Catch the specific error you're interested in
-                        st.error("Please enter your ElevenLabs API Key to generate a story.")
+            voice_submit_button = st.form_submit_button(label="Generate Audio")
+            if voice_submit_button:
+                try:
+                    with st.spinner("Generating your audio..."):
+                        # Generate audio
+                        audio = voice_generator.generate_story_audio(
+                            text=st.session_state.story,
+                            voice=voice,
+                            model=model
+                        )
+                        
+                        print(audio)
+                        st.audio(audio, format="audio/mp3")
+                except UnboundLocalError:  # Catch the specific error you're interested in
+                    st.error("Please enter your ElevenLabs API Key to generate a story.")
 
-        elif audio_option == "Custom voice!":
-            with st.form(key="clone_form"):
-                
-                voice_name = st.text_input("Voice name:", key="voice_name")
-                voice_description = st.text_input(
-                    label="Voice description:",
-                    key="voice_description",
-                    placeholder="An old American male voice with a slight hoarseness in his throat. Perfect for news"
-                    )
-                
-                voice_file = st.file_uploader("Upload a voice sample for the custom voice", type=['mp3', 'wav'])
+    elif audio_option == "Custom voice!":
+        with st.form(key="clone_form"):
+            
+            voice_name = st.text_input("Voice name:", key="voice_name")
+            voice_description = st.text_input(
+                label="Voice description:",
+                key="voice_description",
+                placeholder="An old American male voice with a slight hoarseness in his throat. Perfect for news"
+                )
+            
+            voice_file = st.file_uploader("Upload a voice sample for the custom voice", type=['mp3', 'wav'])
 
-                clone_submit_button = st.form_submit_button(label="Generate Audio")
+            clone_submit_button = st.form_submit_button(label="Generate Audio")
 
-                if clone_submit_button and voice_file is not None:
-                    print(voice_file)
+            if clone_submit_button and voice_file is not None:
+                print(voice_file)
 
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmpfile:
-                        # Write the uploaded audio bytes to temp file
-                        tmpfile.write(voice_file.getvalue())
-                        tmp_filename = tmpfile.name
-                    # Add validation for maximum length of the audio file
-                    audio_info = mediainfo(tmp_filename)
-                    if float(audio_info["duration"]) > 120:
-                        st.error("Uploaded audio is too long. Please upload an audio of maximum 2 minutes.")
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmpfile:
+                    # Write the uploaded audio bytes to temp file
+                    tmpfile.write(voice_file.getvalue())
+                    tmp_filename = tmpfile.name
+                # Add validation for maximum length of the audio file
+                audio_info = mediainfo(tmp_filename)
+                if float(audio_info["duration"]) > 120:
+                    st.error("Uploaded audio is too long. Please upload an audio of maximum 2 minutes.")
 
-                    try:
-                        with st.spinner("Creating the story audio with custom voice..."):
-                            custom_audio = voice_generator.generate_story_with_new_voice(
-                                text=st.session_state.story,
-                                name=st.session_state.voice_name,
-                                description=st.session_state.voice_description,
-                                files=[tmp_filename]
-                            )
-                            print(custom_audio)
-                            st.audio(custom_audio, format="audio/mp3")
-                    except Exception as e:
-                        print(e)
-                        st.error("Cloning went wrong...")
-                    finally:
-                        os.remove(tmp_filename)
+                try:
+                    with st.spinner("Creating the story audio with custom voice..."):
+                        custom_audio = voice_generator.generate_story_with_new_voice(
+                            text=st.session_state.story,
+                            name=st.session_state.voice_name,
+                            description=st.session_state.voice_description,
+                            files=[tmp_filename]
+                        )
+                        print(custom_audio)
+                        st.audio(custom_audio, format="audio/mp3")
+                except Exception as e:
+                    print(e)
+                    st.error("Cloning went wrong...")
+                finally:
+                    os.remove(tmp_filename)
                 
 
 
