@@ -10,7 +10,6 @@ def main():
     # Create an instance of StoryGenerator
     openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
     elevenlabs_api_key = st.text_input("Enter your ElvenLabs API Key", type="password")
-    
     if openai_api_key:  # only instantiate StoryGenerator after API key is entered
         generator = StoryGenerator(api_key=openai_api_key)
 
@@ -19,7 +18,6 @@ def main():
 
     # User can select to provide full story or generate it
     story_option = st.selectbox("Choose an option:", ["I will provide the full story", "Generate story based on my summary"])
-
 
     if story_option == "I will provide the full story":
         user_story = st.text_area("Enter your story here:")
@@ -37,8 +35,8 @@ def main():
                     with st.spinner('Generating your story...'):
                         # Generate story
                         story = generator.generate_story(story_summary)
-                        st.session_state.story = story
-                    # TODO: Implement a clean output text method
+                        # TODO: Implement a clean output text method
+                        st.session_state.story = story.lstrip()
                     st.text_area("AI Generated Story:", value=st.session_state.story)
 
                 except UnboundLocalError:  # Catch the specific error you're interested in
@@ -46,7 +44,7 @@ def main():
 
         
         with st.form(key="voice_form"):
-            voice = st.selectbox("Choose a voice:", ["Arnold", "Adam"])
+            voice = st.selectbox("Choose a voice:", voice_generator.get_list_of_voices())
             model = st.selectbox("Choose a model:", ["eleven_multilingual_v1"])
 
             voice_submit_button = st.form_submit_button(label="Generate Audio")

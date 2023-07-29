@@ -1,4 +1,4 @@
-from elevenlabs import set_api_key, generate
+from elevenlabs import set_api_key, generate, voices
 import os
 from dotenv import load_dotenv
 
@@ -38,8 +38,8 @@ class VoiceGenerator:
             return ""
     
     @staticmethod
-    def generate_list_of_voices():
-        pass
+    def get_list_of_voices():
+        return [v.name for v in voices()]
 
 
 
@@ -48,4 +48,5 @@ if __name__ == "__main__":
 
     voice_generator = VoiceGenerator()
 
-    print(voice_generator.generate_story_audio("Hello, this is Arnold!"))
+    # print(voice_generator.generate_story_audio("Hello, this is Arnold!"))
+    print(voice_generator.get_list_of_voices())
