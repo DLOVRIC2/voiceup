@@ -19,7 +19,9 @@ class VoiceGenerator:
 
         # Define the path to the audio file storage directory
         self.audio_file_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), 'db', 'storage', 'audios')
-
+        # Create the directory and its parent directories if they don't exist
+        if not os.path.exists(self.audio_file_dir):
+            os.makedirs(self.audio_file_dir)
     def generate_story_audio(self, text: str, voice: str = "Arnold", model: str = "eleven_multilingual_v1"):
 
         # TODO: Implement some kind of file naming protocol
