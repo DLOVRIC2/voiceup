@@ -1,12 +1,20 @@
 import streamlit as st
 from story_generation.story_generator import StoryGenerator
 
+
 def main():
     st.title("Welcome to VoiceUp!")
     st.header("This is a platform for creators to create short clips based on their own content.")
 
     # Create an instance of StoryGenerator
-    generator = StoryGenerator()
+    api_key = st.text_input("Enter your OpenAI API Key", type="password")
+    
+    if api_key:  # only instantiate StoryGenerator after API key is entered
+        generator = StoryGenerator(api_key=api_key)
+
+        # Rest of your code goes here
+    else:
+        st.warning("Please enter your OpenAI API Key to proceed.")
 
     # User can select to provide full story or generate it
     story_option = st.selectbox("Choose an option:", ["I will provide the full story", "Generate story based on my summary"])
@@ -22,11 +30,15 @@ def main():
             submit_button = st.form_submit_button(label='Generate Story')
 
             if submit_button:
-                with st.spinner('Generating your story...'):
-                    # Generate story
-                    story = generator.generate_story(story_summary)
-                # TODO: Implement a clean output text method
-                st.text_area("AI Generated Story:", value=story.lstrip())
+                try:
+                    with st.spinner('Generating your story...'):
+                        # Generate story
+                        story = generator.generate_story(story_summary)
+                    # TODO: Implement a clean output text method
+                    st.text_area("AI Generated Story:", value=story.lstrip())
+                    
+                except UnboundLocalError:  # Catch the specific error you're interested in
+                    st.error("Please enter your OpenAI API Key to generate a story.")
 
 if __name__ == "__main__":
     main()
