@@ -6,6 +6,8 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+    ports:
+      - 8501:8501
   db:
     # Build the database service using the Dockerfile in the db directory
     build:

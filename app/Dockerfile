@@ -11,7 +11,7 @@ COPY . .
 RUN pip install -r requirements.txt
 
 # Expose port 8000 for the app
-EXPOSE 8000
+EXPOSE 8501
 
 # Start the app
-CMD ["python", "app.py"]
+CMD streamlit run --server.port 8501 app.py
