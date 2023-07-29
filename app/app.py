@@ -25,7 +25,6 @@ def main():
                 with st.spinner('Generating your story...'):
                     # Generate story
                     story = generator.generate_story(story_summary)
-                    print(story)
                 # TODO: Implement a clean output text method
                 st.text_area("AI Generated Story:", value=story.lstrip())
 

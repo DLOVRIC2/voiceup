@@ -16,6 +16,9 @@ load_dotenv(env_paht)
 
 
 class StoryTemplates:
+    """
+    Class that holds all the templates required for the story generation, review and improvement.
+    """
 
     story_template = """You are a storywriter. Given a short description, you can generate a story based on the idea in 75-100 words.
     
@@ -44,6 +47,16 @@ class StoryGenerator:
 
     
     def generate_story(self, idea):
+        """
+        Method that uses llm chains to generates a story, reviews and modifies the story
+        accordingly.
+
+        Args:
+            idea: Input from the user on the story idea.
+
+        Returns:
+            str - LLM generated story
+        """
 
         # Story generation
         story_template = PromptTemplate(input_variables=["idea"], template=StoryTemplates.story_template)
