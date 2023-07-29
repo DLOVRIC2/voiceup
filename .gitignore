@@ -5,3 +5,7 @@
 # Docker artifacts
 *.pyc
 .DS_Store
+
+# Audio files
+.mp3
+.wav
