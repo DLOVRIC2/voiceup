@@ -1,6 +1,7 @@
-from elevenlabs import set_api_key, generate, voices
+from elevenlabs import set_api_key, generate, voices, clone
 import os
 from dotenv import load_dotenv
+from typing import List
 
 # Load the environment variables
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), '.env')
@@ -38,6 +39,29 @@ class VoiceGenerator:
         except Exception as e:
             print(e)
             return ""
+
+    def generate_story_with_new_voice(self, text: str, name: str, description: str, files: List[str]):
+
+        audio_path = os.path.join(self.audio_file_dir, f"{name}.mp3")
+
+        voice = clone(
+            name=name,
+            description=description,
+            files=files
+        )
+
+        audio = generate(text=text, voice=voice)
+
+        try:
+            with open(audio_path, "wb") as f:
+                f.write(audio)
+            return audio_path
+
+        except Exception as e:
+            print(e)
+            return ""
+
+
     
     @staticmethod
     def get_list_of_voices():
