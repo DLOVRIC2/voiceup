@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8501:8501
+    volumes:
+      - shared_data:/db
   db:
     # Build the database service using the Dockerfile in the db directory
     build:
@@ -16,6 +18,7 @@ services:
     # Define a volume for PostgreSQL data
     volumes:
       - ./db:/db
+      - db_data:/var/lib/postgresql/data
 
 # Define the named volume for PostgreSQL data
 volumes:

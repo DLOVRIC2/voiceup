@@ -1,6 +1,8 @@
 # Use the official PostgreSQL image as the base image
 FROM postgres:12
 
+COPY . /db
+
 # Environment variables to configure the PostgreSQL server
 ENV POSTGRES_USER=myuser
 ENV POSTGRES_PASSWORD=mypassword
