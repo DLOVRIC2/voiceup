@@ -11,7 +11,8 @@ import logging
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import glob
 from PIL import Image
-
+import openai
+import requests
 
 # Load the environment variables
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), '.env')
@@ -56,6 +57,8 @@ class VideoGenerator:
         self.audio_path = audio_path
         self.image_path = image_path
         self.subtitle_path = subtitle_path
+
+        openai.api_key = os.environ.get("OPENAI_KEY", openai_api_key)
         
     def upload_images(self, image_files: List[str], destination_folder: str):
         """
@@ -163,7 +166,36 @@ class VideoGenerator:
             # TODO: Figure out how to generate subtitles. This seems to be the fix
             # https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
             pass
+    
+    def generate_images_with_dalle(self, prompt: str, size: tuple = Frames.INSTAGRAM_POST):
 
+        size_for_openai = "1024x1024"
+        
+        try:
+            generation_response = openai.Image.create(
+                prompt=prompt,
+                n=1,
+                size=size_for_openai,
+                response_format="url"
+            )
+
+            # save the image
+            generated_image_name = "generated_image.png"  # any name you like; the filetype should be .png
+            generated_image_filepath = os.path.join(self.image_path, generated_image_name)
+
+            generated_image_url = generation_response["data"][0]["url"]  # extract image URL from response
+            generated_image = requests.get(generated_image_url).content  # download the image
+
+            with open(generated_image_filepath, "wb") as image_file:
+                image_file.write(generated_image)
+              # write the image to the file
+            
+            print("Sucess!")
+
+            return generated_image_filepath
+        
+        except Exception as e:
+            print(e)
 
 if __name__ == "__main__":
 
@@ -176,7 +208,10 @@ if __name__ == "__main__":
     image_path =  os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images/")
     image_list = [file for file in os.listdir(image_path) if file.startswith("rand")]
 
-    vg.create_video(image_files=image_list,
-                    audio_file_path=aud)
+    # vg.create_video(image_files=image_list,
+    #                 audio_file_path=aud)
 
+    prompt = "rusty old phone booth"
+
+    vg.generate_images_with_dalle(prompt=prompt)
     
