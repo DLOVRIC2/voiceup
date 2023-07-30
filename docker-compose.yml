@@ -8,8 +8,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8501:8501
-    volumes:
-      - shared_data:/db
+
   db:
     # Build the database service using the Dockerfile in the db directory
     build:
