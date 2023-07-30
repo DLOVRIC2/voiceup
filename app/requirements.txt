@@ -11,7 +11,7 @@ certifi==2023.7.22
 charset-normalizer==3.2.0
 click==8.1.6
 dataclasses-json==0.5.13
-decorator==5.1.1
+decorator==4.4.2
 elevenlabs==0.2.21
 executing==1.2.0
 frozenlist==1.4.0
@@ -20,6 +20,8 @@ GitPython==3.1.32
 greenlet==2.0.2
 htbuilder==0.6.1
 idna==3.4
+imageio==2.31.1
+imageio-ffmpeg==0.4.8
 importlib-metadata==6.8.0
 ipython==8.14.0
 jedi==0.18.2
@@ -34,7 +36,9 @@ marshmallow==3.20.1
 matplotlib-inline==0.1.6
 mdurl==0.1.2
 more-itertools==10.0.0
+moviepy==1.0.3
 multidict==6.0.4
+mutagen==1.46.0
 mypy-extensions==1.0.0
 numexpr==2.8.4
 numpy==1.25.1
@@ -46,6 +50,7 @@ parso==0.8.3
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.5.0
+proglog==0.1.10
 prompt-toolkit==3.0.39
 protobuf==4.23.4
 ptyprocess==0.7.0
@@ -53,6 +58,7 @@ pure-eval==0.2.2
 pyarrow==12.0.1
 pydantic==1.10.12
 pydeck==0.8.0
+pydub==0.25.1
 Pygments==2.15.1
 Pympler==1.0.1
 python-dateutil==2.8.2
