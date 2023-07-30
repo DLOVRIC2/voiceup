@@ -18,8 +18,11 @@ class VoiceGenerator:
             raise ValueError("API Key must be provided if ELEVEN_LABS_KEY environment variable is not set")
         set_api_key(key)
 
-        # Define the path to the audio file storage directory
-        self.audio_file_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), 'db', 'storage', 'audios')
+        # Define the path to the audio file storage directory (db is copied into app folder in docker)
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        storage_dir = "app/db/storage" if os.path.exists(os.path.join(root_dir, "app/db/storage")) else "db/storage"
+        self.audio_file_dir = os.path.join(storage_dir, "audios")
+
         # Create the directory and its parent directories if they don't exist
         if not os.path.exists(self.audio_file_dir):
             os.makedirs(self.audio_file_dir, exist_ok=True)
