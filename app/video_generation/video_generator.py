@@ -26,7 +26,6 @@ class VideoGenerator:
     subtitle_storage_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/subtitles")
 
     def __init__(self, 
-                 src: List[str] | str, 
                  video_path: str = video_storage_path,
                  audio_path: str = audio_storage_path,
                  image_path: str = image_storage_path,
@@ -44,7 +43,6 @@ class VideoGenerator:
         :param stable_diff_api_key - api key for Stable Diffusion
         """
 
-        self.src = src
         self.video_path = video_path
         self.audio_path = audio_path
         self.image_path = image_path
@@ -90,7 +88,7 @@ class VideoGenerator:
         # Delete temporary gif
         os.remove("temp.gif")
     
-    def generate_video_static(self, audio_file_path: str, static_image: Optional[str] = None):
+    def generate_video_static(self, audio_file_path: str = None, static_image: Optional[str] = None):
         """
         :param audio_file_path: Path of the audio file to use for the video
         :param static_image: Path of the static image, defaults to black
@@ -98,6 +96,10 @@ class VideoGenerator:
         # Check static image
         if not static_image:
             static_image = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images/black_image.png")
+        
+        if not audio_file_path:
+            # TODO: Current saving of audio is to a file called 'test.mp3' so if its not provided we will just grab that one. This needs to be updated.
+            audio_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/audios/test.mp3")
 
         # Load the audio file
         audio = AudioFileClip(audio_file_path)
@@ -134,5 +136,5 @@ if __name__ == "__main__":
 
     img = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images/black_image.png")
     aud = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/audios/test.mp3")
-    vg = VideoGenerator(src=[img])
+    vg = VideoGenerator()
     vg.generate_video_static(aud, img)
