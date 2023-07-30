@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     # Define a volume for PostgreSQL data
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./db:/db
 
 # Define the named volume for PostgreSQL data
 volumes:
