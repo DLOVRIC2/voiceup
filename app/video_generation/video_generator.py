@@ -8,16 +8,20 @@ from PIL import Image
 from moviepy.editor import TextClip, CompositeVideoClip, ImageClip
 from moviepy.editor import *
 import logging
-
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import glob
-
+from PIL import Image
 
 
 # Load the environment variables
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), '.env')
 load_dotenv(env_path)
 
+class Frames:
+    INSTAGRAM_REEL = (1080, 1920)  # size in pixels
+    YOUTUBE_REEL = (1920, 1080)    
+    TIKTOK_REEL = (1080, 1920)     
+    INSTAGRAM_POST = (1080, 1080)  
 
 class VideoGenerator:
 
@@ -60,7 +64,23 @@ class VideoGenerator:
         """
         for image_file in image_files:
             shutil.copy(image_file, destination_folder)
+    
+    
+    def resize_image(self, image_path: str, size: tuple = Frames.INSTAGRAM_REEL) -> str:
+        """Resize an image to the specified size and save it.
 
+        Args:
+            image_path: The path to the image to resize.
+            size: The desired size as a tuple (width, height).
+
+        Returns:
+            The path to the saved image.
+        """
+        img = Image.open(image_path)
+        img = img.resize(size)
+        new_image_path = image_path.rsplit('.', 1)[0] + '_resized.' + image_path.rsplit('.', 1)[1]
+        img.save(new_image_path)
+        return new_image_path
 
     def read_audio_file(self, audio_file_path: str):
         """
@@ -70,19 +90,27 @@ class VideoGenerator:
         audio = MP3(audio_file_path)
         return audio.info.length
 
-    def create_video(self, image_files: List[str], audio_file_path: str, output_video_path: str):
+    def create_video(self, image_files: List[str], audio_file_path: str = None, video_size: tuple = Frames.INSTAGRAM_REEL):
         """
         :param image_files: List of paths of images to use for the video
         :param audio_file_path: Path of the audio file to use for the video
-        :param output_video_path: Path of the output video file
+        :param video_size: Tuple , defaults to size for IG reel
         """
+        if not audio_file_path:
+            # TODO: Current saving of audio is to a file called 'test.mp3' so if its not provided we will just grab that one. This needs to be updated.
+            audio_file_path = os.path.join(self.audio_path, "test.mp3")
+
         # Calculate duration per image
         audio_length = self.read_audio_file(audio_file_path)
         duration_per_image = audio_length / len(image_files)
         
         # Open, resize and save images as gif
-        images = [Image.open(image).resize((800, 800), Image.ANTIALIAS) for image in image_files]
+        images = [Image.open(image).resize(video_size, Image.ANTIALIAS) for image in image_files]
         images[0].save("temp.gif", save_all=True, append_images=images[1:], duration=int(duration_per_image)*1000)
+
+        # Set output file name
+        output_file_name = os.path.splitext(os.path.basename(audio_file_path))[0] + '.mp4'
+        output_video_path = os.path.join(self.video_path, output_file_name)
         
         # Combine audio and gif to create video
         video = editor.VideoFileClip("temp.gif")
@@ -102,7 +130,6 @@ class VideoGenerator:
         if not static_image:
             static_image = os.path.join(self.image_path, "black_image.png")
             
-        
         if not audio_file_path:
             # TODO: Current saving of audio is to a file called 'test.mp3' so if its not provided we will just grab that one. This needs to be updated.
             audio_file_path = os.path.join(self.audio_path, "test.mp3")
@@ -143,4 +170,13 @@ if __name__ == "__main__":
     img = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images/black_image.png")
     aud = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/audios/test.mp3")
     vg = VideoGenerator()
-    vg.generate_video_static(aud, img)
+    # vg.generate_video_static(aud, img)
+
+    # Location of all the images
+    image_path =  os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images/")
+    image_list = [file for file in os.listdir(image_path) if file.startswith("rand")]
+
+    vg.create_video(image_files=image_list,
+                    audio_file_path=aud)
+
+    

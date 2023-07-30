@@ -2,6 +2,7 @@ from elevenlabs import set_api_key, generate, voices, clone
 import os
 from dotenv import load_dotenv
 from typing import List
+import logging
 
 # Load the environment variables
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), '.env')
