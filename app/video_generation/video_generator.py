@@ -7,6 +7,7 @@ from moviepy import editor
 from PIL import Image
 from moviepy.editor import TextClip, CompositeVideoClip, ImageClip
 from moviepy.editor import *
+import logging
 
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import glob
@@ -20,10 +21,14 @@ load_dotenv(env_path)
 
 class VideoGenerator:
 
-    video_storage_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/videos")
-    image_storage_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images")
-    audio_storage_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/audios")
-    subtitle_storage_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/subtitles")
+    # If the app is ran in docker, the db folder is copied into the app folder
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    storage_dir = "app/db/storage" if os.path.exists(os.path.join(root_dir, "app/db/storage")) else "db/storage"
+
+    video_storage_path = os.path.join(root_dir, storage_dir, "videos")
+    image_storage_path = os.path.join(root_dir, storage_dir, "images")
+    audio_storage_path = os.path.join(root_dir, storage_dir, "audios")
+    subtitle_storage_path = os.path.join(root_dir, storage_dir, "subtitles")
 
     def __init__(self, 
                  video_path: str = video_storage_path,
@@ -95,11 +100,12 @@ class VideoGenerator:
         """
         # Check static image
         if not static_image:
-            static_image = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/images/black_image.png")
+            static_image = os.path.join(self.image_path, "black_image.png")
+            
         
         if not audio_file_path:
             # TODO: Current saving of audio is to a file called 'test.mp3' so if its not provided we will just grab that one. This needs to be updated.
-            audio_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))), "db/storage/audios/test.mp3")
+            audio_file_path = os.path.join(self.audio_path, "test.mp3")
 
         # Load the audio file
         audio = AudioFileClip(audio_file_path)
