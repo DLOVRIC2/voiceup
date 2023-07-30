@@ -1,6 +1,8 @@
 import streamlit as st
 from story_generation.story_generator import StoryGenerator
 from voice_generation.voice_generator import VoiceGenerator
+from video_generation.video_generator import VideoGenerator
+from moviepy.editor import VideoFileClip
 import tempfile
 import os
 from pydub.utils import mediainfo
@@ -17,12 +19,21 @@ def create_voice_generator(api_key):
     return VoiceGenerator(api_key=api_key)
 
 @st.cache_data(show_spinner=False)
+def create_video_generator(openai_api_key = None, stable_diff_api_key = None):
+    return VideoGenerator(openai_api_key=openai_api_key,
+                          stable_diff_api_key=stable_diff_api_key)
+
+@st.cache_data(show_spinner=False)
 def generate_story(_generator, story_summary):
     return _generator.generate_story(story_summary)
 
 @st.cache_data(show_spinner=False)
 def generate_voice(_voice_generator, text, voice, model):
     return _voice_generator.generate_story_audio(text, voice, model)
+
+@st.cache_data(show_spinner=False)
+def generate_static_video(_video_generator, audio_file, static_image):
+    return _video_generator.generate_video_static(audio_file, static_image)
 
 @st.cache_data(show_spinner=False)
 def create_list_of_voices(_voice_generator):
@@ -50,6 +61,10 @@ def main():
 
     if elevenlabs_api_key:
         voice_generator = create_voice_generator(api_key=elevenlabs_api_key)
+    
+    # Video generator for default properties doesn't need an apy key
+    # TODO: Update this when image generation is integrated
+    video_generator = create_video_generator()
 
     # User can select to provide full story or generate it
     story_option = st.selectbox("Choose an option:", ["Upload your own story", "Generate story using AI"])
@@ -108,7 +123,7 @@ def main():
                         st.error("Please enter your OpenAI API Key to generate a story.")
         
     
-    audio_option = st.selectbox("Choose an option:", ["Use default voices", "Custom voice!"])
+    audio_option = st.selectbox("Generate audio:", ["Use default voices", "Custom voice!"])
     if audio_option == "Use default voices":
         with st.form(key="voice_form"):
 
@@ -173,7 +188,39 @@ def main():
                     st.error("Cloning went wrong...")
                 finally:
                     os.remove(tmp_filename)
-                
+    
+
+    video_option = st.selectbox("Generate a video:", ["Upload my own photos", "Generate new photos!"])
+    
+    if video_option == "Upload my own photos":
+
+        with st.form(key="video_custom_image_form"):
+
+            image_option = st.selectbox("What images would you like?", ["Upload my own photos", "Use static default image"])
+
+            if image_option == "Upload my own photos":
+                st.session_state.images = st.file_uploader("Upload files", [".png", ".jpg"])
+            elif image_option == "Use static default image":
+                st.session_state.image = None # This will default to black_image.png
+
+            video_submitt_button = st.form_submit_button("Generate Video")
+
+            if video_submitt_button:
+                try:
+                    with st.spinner("Generating your video..."):
+
+                        video_generator.generate_video_static(static_image = st.session_state.image)
+                        # TODO: Naming of these videos
+                        file_location = os.path.join(video_generator.video_path, "test.mp4")
+                        print(file_location)
+                        with open(file_location, 'rb') as f:
+                                video_bytes = f.read()
+                        st.video(video_bytes, format="video/mp4")
+                            
+                except Exception as e:
+                    print(e)
+
+
 
 
 
