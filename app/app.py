@@ -4,7 +4,9 @@ from voice_generation.voice_generator import VoiceGenerator
 import tempfile
 import os
 from pydub.utils import mediainfo
-
+from dotenv import load_dotenv
+path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.env')
+load_dotenv(path)
 
 @st.cache_data(show_spinner=False)
 def create_story_generator(api_key):
@@ -40,9 +42,8 @@ def main():
         st.session_state.voice_generator = None
     
     # Create an instance of StoryGenerator
-    openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
-    elevenlabs_api_key = st.text_input("Enter your ElvenLabs API Key", type="password")
-
+    openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
+    elevenlabs_api_key = st.sidebar.text_input("Enter your ElvenLabs API Key", type="password")
 
     if openai_api_key:  # only instantiate StoryGenerator after API key is entered
         generator = create_story_generator(api_key=openai_api_key)
