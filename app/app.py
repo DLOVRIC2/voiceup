@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.env')
 load_dotenv(path)
 import logging
+import mimetypes
+import time
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -42,6 +44,30 @@ def generate_static_video(_video_generator, audio_file, static_image):
 def create_list_of_voices(_voice_generator):
     return _voice_generator.get_list_of_voices()
 
+@st.cache_data(show_spinner=False)
+def save_uploaded_images(_video_generator, image_files):
+    uploaded_images = []
+    for image in image_files:
+            logging.info("This is the image file")
+            logging.info(image)
+            # get the image extension from the image type (e.g., 'image/jpeg' -> '.jpeg')
+            image_extension = mimetypes.guess_extension(image.type)
+            
+            # create a filename, here using the current timestamp to avoid filename conflicts
+            image_filename = f"{int(time.time())}{image_extension}"
+            
+            # create a full path for saving the image (you can adjust the path to your needs)
+            image_path = os.path.join(_video_generator.image_path, image_filename)
+            
+            # write the image to file
+            with open(image_path, "wb") as f:
+                f.write(image.read())
+            
+            # store the path for future use
+            uploaded_images.append(image_path)
+
+    return uploaded_images
+
 def main():
     st.title("Welcome to VoiceUp!")
     st.header("This is a platform for creators to create short clips based on their own content.")
@@ -54,10 +80,15 @@ def main():
     
     if "voice_generator" not in st.session_state:
         st.session_state.voice_generator = None
+
+    if "uploaded_images" not in st.session_state:
+        st.session_state.uploaded_images = None
     
     # Create an instance of StoryGenerator
     openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
     elevenlabs_api_key = st.sidebar.text_input("Enter your ElvenLabs API Key", type="password")
+    openai_api_key = os.environ.get("OPENAI_KEY")
+    elevenlabs_api_key = os.environ.get("ELEVEN_LABS_KEY")
 
 
     if openai_api_key:  # only instantiate StoryGenerator after API key is entered
@@ -205,25 +236,47 @@ def main():
             image_option = st.selectbox("What images would you like?", ["Upload my own photos", "Use static default image"])
 
             if image_option == "Upload my own photos":
-                st.session_state.images = st.file_uploader("Upload files", [".png", ".jpg"])
+                uploaded_images = st.file_uploader("Upload files:", [".png", ".jpg"], accept_multiple_files=True)
+
             elif image_option == "Use static default image":
                 st.session_state.image = None # This will default to black_image.png
 
             video_submitt_button = st.form_submit_button("Generate Video")
-
+            
             if video_submitt_button:
-                try:
-                    with st.spinner("Generating your video..."):
-                        video_generator.generate_video_static(static_image = st.session_state.image)
-                        # TODO: Naming of these videos
-                        file_location = os.path.join(video_generator.video_path, "test.mp4")
-                        print(file_location)
-                        with open(file_location, 'rb') as f:
+
+                if uploaded_images and image_option == "Upload my own photos":
+                    st.session_state.uploaded_images = save_uploaded_images(video_generator, uploaded_images)
+                    # TODO: Naming of these videos
+
+                    try:
+                        with st.spinner("Generating your video..."):
+                            video_generator.create_video(st.session_state.uploaded_images)
+                            file_location = os.path.join(video_generator.video_path, "test.mp4")
+
+                            with open(file_location, "rb") as f:
                                 video_bytes = f.read()
-                        st.video(video_bytes, format="video/mp4")
-                            
-                except Exception as e:
-                    print(e)
+                            st.video(video_bytes, format="video/mp4")
+                    except Exception as e:
+                            st.error("")
+
+                elif image_option == "Use static default image":
+                    try:
+                        with st.spinner("Generating your video..."):
+                            video_generator.generate_video_static(static_image = st.session_state.image)
+                            # TODO: Naming of these videos
+                            file_location = os.path.join(video_generator.video_path, "test.mp4")
+
+                            with open(file_location, 'rb') as f:
+                                    video_bytes = f.read()
+                            st.video(video_bytes, format="video/mp4")
+                                
+                    except Exception as e:
+                        print(e)
+                
+                else:
+                    st.error("Upload some photos first!")
+
 
 
 
