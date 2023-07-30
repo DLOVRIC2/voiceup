@@ -42,8 +42,7 @@ def main():
     # Create an instance of StoryGenerator
     openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
     elevenlabs_api_key = st.text_input("Enter your ElvenLabs API Key", type="password")
-    openai_api_key="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"
-    elevenlabs_api_key="b7f53d0523f4ddb822c7a7550434a6e5"
+
 
     if openai_api_key:  # only instantiate StoryGenerator after API key is entered
         generator = create_story_generator(api_key=openai_api_key)
