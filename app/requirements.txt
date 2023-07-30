@@ -14,6 +14,7 @@ dataclasses-json==0.5.13
 decorator==4.4.2
 elevenlabs==0.2.21
 executing==1.2.0
+ffmpeg==1.4
 frozenlist==1.4.0
 gitdb==4.0.10
 GitPython==3.1.32
