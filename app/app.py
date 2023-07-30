@@ -6,10 +6,6 @@ import os
 from pydub.utils import mediainfo
 
 
-
-
-
-
 def main():
     st.title("Welcome to VoiceUp!")
     st.header("This is a platform for creators to create short clips based on their own content.")
@@ -32,13 +28,24 @@ def main():
         voice_generator = VoiceGenerator(api_key=elevenlabs_api_key)
 
     # User can select to provide full story or generate it
-    story_option = st.selectbox("Choose an option:", ["I will provide the full story", "Generate story based on my summary"])
+    story_option = st.selectbox("Choose an option:", ["Upload your own story", "Generate story using AI"])
 
-    if story_option == "I will provide the full story":
-
+    if story_option == "Upload your own story":
+        
         with st.form(key="story_upload_option"):
-
-            user_story = st.text_area("Enter your story here:", key="user_story")
+    
+            uploaded_file = st.file_uploader("Upload your story file", type=["txt"])
+            
+            if uploaded_file is not None:
+                try:
+                # Read the contents of the uploaded file
+                    user_story = uploaded_file.read().decode("utf-8")
+                    
+                    # Display the uploaded story
+                    st.text_area("Your uploaded story:", value=user_story, key="user_story", height=200)
+                    
+                except Exception as e:
+                    st.error(f"Error reading the file: {e}")
 
             submit_button = st.form_submit_button(label="Generate")
             if submit_button:
@@ -46,21 +53,33 @@ def main():
                     st.error("Make sure you enter your story above..")
                 st.session_state.story = user_story
 
-    elif story_option == "Generate story based on my summary":
+
+    elif story_option == "Generate story using AI":
             with st.form(key="story_gen_option"):
 
-                story_summary = st.text_input("Enter a short summary for your story")
+                # story_summary = st.text_input("Enter a short summary for your story")
+                story_genre = st.selectbox("Select Story Genre:", ["Fairy Tale", "Mystery", "Adventure", "Science Fiction"])
+                age_group = st.selectbox("Age Group:", ["Children", "Teenagers", "Adults"])
+                language = st.selectbox("Language:", ["English", "Spanish", "French", "German"])
+                additional_text = st.text_area("Enter additional text (optional):", "")
+        
                 submit_button = st.form_submit_button(label='Generate Story')
 
                 if submit_button:
+            
                     try:
-                        with st.spinner('Generating your story...'):
-                            # Generate story
-                            story = generator.generate_story(story_summary)
-                            # TODO: Implement a clean output text method
-                            st.session_state.story = story.lstrip()
-                        st.text_area("AI Generated Story:", value=st.session_state.story)
+                        # Create a more descriptive prompt for generating the story
+                        if additional_text:
+                            story_summary = f"Generate a {age_group} {story_genre} story in {language} language. Additional Information about the story: {additional_text}"
+                        else:
+                            story_summary = f"Generate a {age_group} {story_genre} story in {language} language."
 
+                        with st.spinner('Generating your story...'):
+                            # Generate story (replace this with your AI-based story generation logic)
+                            generated_story = generator.generate_story(story_summary)
+                            st.session_state.story = generated_story.lstrip()
+
+                        st.text_area("AI Generated Story:", value=st.session_state.story)
                     except UnboundLocalError:  # Catch the specific error you're interested in
                         st.error("Please enter your OpenAI API Key to generate a story.")
         
