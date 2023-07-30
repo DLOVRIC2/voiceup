@@ -9,6 +9,9 @@ from pydub.utils import mediainfo
 from dotenv import load_dotenv
 path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.env')
 load_dotenv(path)
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @st.cache_data(show_spinner=False)
 def create_story_generator(api_key):
@@ -211,7 +214,6 @@ def main():
             if video_submitt_button:
                 try:
                     with st.spinner("Generating your video..."):
-
                         video_generator.generate_video_static(static_image = st.session_state.image)
                         # TODO: Naming of these videos
                         file_location = os.path.join(video_generator.video_path, "test.mp4")
