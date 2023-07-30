@@ -79,7 +79,7 @@ def save_uploaded_images(_video_generator, image_files):
     return uploaded_images
 
 def main():
-    st.title("Welcome to Reelify!")
+    st.title("Welcome to :orange[_Reelify_!]")
 
     # Instantiate some variables in the session state
     if "story" not in st.session_state:
@@ -97,9 +97,6 @@ def main():
     # Create an instance of StoryGenerator
     openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
     elevenlabs_api_key = st.sidebar.text_input("Enter your ElvenLabs API Key", type="password")
-    openai_api_key = os.environ.get("OPENAI_KEY")
-    elevenlabs_api_key = os.environ.get("ELEVEN_LABS_KEY")
-
 
     if openai_api_key:  # only instantiate StoryGenerator after API key is entered
         generator = create_story_generator(api_key=openai_api_key)
@@ -121,7 +118,9 @@ def main():
 
 
     with st.container():
+        st.header(":blue[Story Generation]")
         st.write("-----")
+
         left_column, right_column = st.columns(2)
         with left_column:
              # User can select to provide full story or generate it
@@ -184,6 +183,7 @@ def main():
 
     
     with st.container():
+        st.header(":blue[Audio Generation]")
         st.write("-----")
         left_column2, right_column2 = st.columns(2)
         with left_column2:
@@ -260,6 +260,7 @@ def main():
 
 
     with st.container():
+        st.header(":blue[Video Generation]")
         st.write("-----")
         left_column3, right_column3 = st.columns(2)
         with left_column3:
@@ -362,15 +363,6 @@ def main():
 
             with right_column3:
                 st_lottie(lottie_video, height=300, key="video_lottie", quality="high")
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
