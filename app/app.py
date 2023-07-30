@@ -9,6 +9,8 @@ from pydub.utils import mediainfo
 def main():
     st.title("Welcome to VoiceUp!")
     st.header("This is a platform for creators to create short clips based on their own content.")
+    with st.expander("About the App"):
+            st.write("AI Video Genereration app with Video's Summary and voice cloned feature")
 
     # Instantiate some variables in the session state
     if "story" not in st.session_state:
