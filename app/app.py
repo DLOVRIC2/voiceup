@@ -6,10 +6,6 @@ import os
 from pydub.utils import mediainfo
 
 
-
-
-
-
 def main():
     st.title("Welcome to VoiceUp!")
     st.header("This is a platform for creators to create short clips based on their own content.")
@@ -58,28 +54,19 @@ def main():
                 st.session_state.story = user_story
 
 
-        # with st.form(key="story_upload_option"):
-
-        #     user_story = st.text_area("Enter your story here:", key="user_story")
-
-        #     submit_button = st.form_submit_button(label="Generate")
-        #     if submit_button:
-        #         if user_story in ("", "None", None):
-        #             st.error("Make sure you enter your story above..")
-        #         st.session_state.story = user_story
-
     elif story_option == "Generate story using AI":
             with st.form(key="story_gen_option"):
 
                 # story_summary = st.text_input("Enter a short summary for your story")
                 story_genre = st.selectbox("Select Story Genre:", ["Fairy Tale", "Mystery", "Adventure", "Science Fiction"])
                 age_group = st.selectbox("Age Group:", ["Children", "Teenagers", "Adults"])
-                language = st.selectbox("Language:", ["English", "Spanish", "French", "German", "Urdu"])
+                language = st.selectbox("Language:", ["English", "Spanish", "French", "German"])
                 additional_text = st.text_area("Enter additional text (optional):", "")
         
                 submit_button = st.form_submit_button(label='Generate Story')
 
                 if submit_button:
+            
                     try:
                         # Create a more descriptive prompt for generating the story
                         if additional_text:
@@ -89,7 +76,7 @@ def main():
 
                         with st.spinner('Generating your story...'):
                             # Generate story (replace this with your AI-based story generation logic)
-                            generated_story = "Once upon a time..."
+                            generated_story = generator.generate_story(story_summary)
                             st.session_state.story = generated_story.lstrip()
 
                         st.text_area("AI Generated Story:", value=st.session_state.story)
