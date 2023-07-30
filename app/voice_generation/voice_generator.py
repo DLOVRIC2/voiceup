@@ -61,14 +61,10 @@ class VoiceGenerator:
         except Exception as e:
             print(e)
             return ""
-
-
     
     @staticmethod
     def get_list_of_voices():
         return [v.name for v in voices()]
-
-
 
 
 if __name__ == "__main__":
