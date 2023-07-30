@@ -6,6 +6,26 @@ import os
 from pydub.utils import mediainfo
 
 
+@st.cache_data(show_spinner=False)
+def create_story_generator(api_key):
+    return StoryGenerator(api_key=api_key)
+
+@st.cache_data(show_spinner=False)
+def create_voice_generator(api_key):
+    return VoiceGenerator(api_key=api_key)
+
+@st.cache_data(show_spinner=False)
+def generate_story(_generator, story_summary):
+    return _generator.generate_story(story_summary)
+
+@st.cache_data(show_spinner=False)
+def generate_voice(_voice_generator, text, voice, model):
+    return _voice_generator.generate_story_audio(text, voice, model)
+
+@st.cache_data(show_spinner=False)
+def create_list_of_voices(_voice_generator):
+    return _voice_generator.get_list_of_voices()
+
 def main():
     st.title("Welcome to VoiceUp!")
     st.header("This is a platform for creators to create short clips based on their own content.")
@@ -22,12 +42,14 @@ def main():
     # Create an instance of StoryGenerator
     openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
     elevenlabs_api_key = st.text_input("Enter your ElvenLabs API Key", type="password")
+    openai_api_key="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"
+    elevenlabs_api_key="b7f53d0523f4ddb822c7a7550434a6e5"
 
     if openai_api_key:  # only instantiate StoryGenerator after API key is entered
-        generator = StoryGenerator(api_key=openai_api_key)
+        generator = create_story_generator(api_key=openai_api_key)
 
     if elevenlabs_api_key:
-        voice_generator = VoiceGenerator(api_key=elevenlabs_api_key)
+        voice_generator = create_voice_generator(api_key=elevenlabs_api_key)
 
     # User can select to provide full story or generate it
     story_option = st.selectbox("Choose an option:", ["Upload your own story", "Generate story using AI"])
@@ -78,7 +100,7 @@ def main():
 
                         with st.spinner('Generating your story...'):
                             # Generate story (replace this with your AI-based story generation logic)
-                            generated_story = generator.generate_story(story_summary)
+                            generated_story = generate_story(generator, story_summary)
                             st.session_state.story = generated_story.lstrip()
 
                         st.text_area("AI Generated Story:", value=st.session_state.story)
@@ -90,7 +112,7 @@ def main():
     if audio_option == "Use default voices":
         with st.form(key="voice_form"):
 
-            voice = st.selectbox("Choose a voice:", voice_generator.get_list_of_voices())
+            voice = st.selectbox("Choose a voice:", create_list_of_voices(voice_generator))
             model = st.selectbox("Choose a model:", ["eleven_multilingual_v1"])
 
             voice_submit_button = st.form_submit_button(label="Generate Audio")
@@ -98,7 +120,8 @@ def main():
                 try:
                     with st.spinner("Generating your audio..."):
                         # Generate audio
-                        audio = voice_generator.generate_story_audio(
+                        audio = generate_voice(
+                            voice_generator,
                             text=st.session_state.story,
                             voice=voice,
                             model=model
