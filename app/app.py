@@ -12,6 +12,9 @@ load_dotenv(path)
 import logging
 import mimetypes
 import time
+from PIL import Image
+st.set_page_config(page_title="Reelify", page_icon=":tada:", layout="wide")
+
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -69,10 +72,7 @@ def save_uploaded_images(_video_generator, image_files):
     return uploaded_images
 
 def main():
-    st.title("Welcome to VoiceUp!")
-    st.header("This is a platform for creators to create short clips based on their own content.")
-    with st.expander("About the App"):
-            st.write("AI Video Genereration app with Video's Summary and voice cloned feature")
+    st.title("Welcome to Reelify!")
 
     # Instantiate some variables in the session state
     if "story" not in st.session_state:
@@ -83,6 +83,9 @@ def main():
 
     if "uploaded_images" not in st.session_state:
         st.session_state.uploaded_images = None
+    
+    if "generated_image" not in st.session_state:
+        st.session_state.generated_image = None
     
     # Create an instance of StoryGenerator
     openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
@@ -257,6 +260,15 @@ def main():
                             with open(file_location, "rb") as f:
                                 video_bytes = f.read()
                             st.video(video_bytes, format="video/mp4")
+
+                            # Download video
+                            st.download_button(
+                                label="Download Video",
+                                data=video_bytes,
+                                file_name=file_location,
+                                mime="video/mp4",
+                            )
+
                     except Exception as e:
                             st.error("")
 
@@ -276,6 +288,46 @@ def main():
                 
                 else:
                     st.error("Upload some photos first!")
+
+
+    elif video_option == "Generate new photos!":
+
+        with st.form("image_generation_form"):
+
+            prompt = st.text_input(label="Describe the photo:", key="user_image_prompt")
+
+            image_generation_submit_button = st.form_submit_button("Generate photo")
+            
+            if image_generation_submit_button:
+                with st.spinner("Generating your image..."):
+                    generated_image = video_generator.generate_images_with_dalle(prompt=prompt)
+                    
+                    if generated_image is not None:
+                        st.session_state.generated_image = generated_image
+                        image = Image.open(generated_image)
+                        st.image(image, caption="Reelify")
+
+
+        with st.form("video_generated_image_form"):
+
+            video_gen_submit_button = st.form_submit_button("Generate video")
+            
+            if video_gen_submit_button:
+
+                with st.spinner("Generating your video..."):
+                    try:
+                        video_generator.generate_video_static(static_image=st.session_state.generated_image)
+                         # TODO: Naming of these videos
+                        file_location = os.path.join(video_generator.video_path, "test.mp4")
+
+                        with open(file_location, 'rb') as f:
+                                video_bytes = f.read()
+                        st.video(video_bytes, format="video/mp4")
+                                
+                    except Exception as e:
+                        print(e)
+
+
 
 
 
