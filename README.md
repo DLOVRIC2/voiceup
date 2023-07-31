@@ -2,8 +2,7 @@
 
 ## VoiceUp Application
 
-VoiceUp is a multi-service application that includes a Python-based web app and a PostgreSQL database.
-
+From Text to Vivid Reels: Reelify Makes AI Magic!
 ![Reelify GIF](./db/storage/videos/reelify.gif)
 
 
