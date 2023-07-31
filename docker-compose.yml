@@ -18,6 +18,7 @@ services:
       dockerfile: Dockerfile
     # Define a volume for PostgreSQL data
     volumes:
+      - ./db/storage/lottiefiles:/db/storage/lottiefiles
       - shared_data:/db
       - db_data:/var/lib/postgresql/data
 
