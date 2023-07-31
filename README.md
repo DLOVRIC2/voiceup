@@ -2,7 +2,7 @@
 
 ## VoiceUp Application
 
-From Text to Vivid Reels: Reelify Makes AI Magic!
+From Text to Vivid Reels - Reelify Makes AI Magic!
 ![Reelify GIF](db/storage/videos/reelify.gif)
 
 
