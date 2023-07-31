@@ -6,6 +6,8 @@ From Text to Vivid Reels - Reelify Makes AI Magic!
 
 ![Reelify GIF](db/storage/videos/reelify.gif)
 
+Check out the app at:
+https://voiceup-42pkefzkb9hfr2k8vag54n.streamlit.app/
 
 ### Prerequisites
 
