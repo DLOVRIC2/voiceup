@@ -167,7 +167,9 @@ class VideoGenerator:
             # https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
             pass
     
-    def generate_images_with_dalle(self, prompt: str, size: tuple = Frames.INSTAGRAM_POST):
+    def generate_images_with_dalle(self, api_key: str, prompt: str, size: tuple = Frames.INSTAGRAM_POST):
+
+        openai.api_key = api_key
 
         size_for_openai = "1024x1024"
         

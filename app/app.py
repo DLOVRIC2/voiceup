@@ -110,11 +110,10 @@ def main():
 
     # ---- LOAD ASSETS
      # Define the path to the audio file storage directory (db is copied into app folder in docker)
-    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-    storage_dir = "app/db/storage" if os.path.exists(os.path.join(root_dir, "app/db/storage")) else "db/storage"
-    lottie_story = load_lottiefile(f"{storage_dir}/lottiefiles/story.json")
-    lottie_audio = load_lottiefile(f"{storage_dir}/lottiefiles/sound.json")
-    lottie_video = load_lottiefile(f"{storage_dir}/lottiefiles/video.json")
+    root_dir = os.path.dirname(os.path.realpath(__file__))
+    lottie_story = load_lottiefile(f"{root_dir}/lottiefiles/story.json")
+    lottie_audio = load_lottiefile(f"{root_dir}/lottiefiles/sound.json")
+    lottie_video = load_lottiefile(f"{root_dir}/lottiefiles/video.json")
 
 
     with st.container():
@@ -334,7 +333,7 @@ def main():
                     
                     if image_generation_submit_button:
                         with st.spinner("Generating your image..."):
-                            generated_image = video_generator.generate_images_with_dalle(prompt=prompt)
+                            generated_image = video_generator.generate_images_with_dalle(api_key=openai_api_key,prompt=prompt)
                             
                             if generated_image is not None:
                                 st.session_state.generated_image = generated_image
